@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+venv/
+.env
+figma/node_modules/
+figma/dist/

@@ -1,0 +1,8 @@
+{
+  "name": "FingerSpell",
+  "description": "Interactive sign language learning platform built with an Express backend, featuring visual sign dictionary and progress metrics..",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FingerSpell Webcam Test</title>
+</head>
+<body>
+    <h1>FingerSpell Webcam Test</h1>
+
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+
+    <br><br>
+
+    <button onclick="startPrediction()">Start Live Prediction</button>
+    <button onclick="stopPrediction()">Stop</button>
+
+    <h2>Result:</h2>
+    <pre id="result"></pre>
+
+    <script>
+        const video = document.getElementById("webcam");
+        const canvas = document.getElementById("canvas");
+        const resultBox = document.getElementById("result");
+
+        let predictionInterval = null; 
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => {
+                resultBox.textContent = "Camera error: " + error;
+            });
+
+        async function sendFrame() {
+            const context = canvas.getContext("2d");
+
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL("image/jpeg");
+
+            const response = await fetch("predict", { //http://127.0.0.1:5000/predict
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    image: imageData
+                })
+            });
+
+            const data = await response.json();
+
+            console.log("Backend response:", data);
+            
+            resultBox.textContent = JSON.stringify(data, null, 2);
+
+        }
+
+        function startPrediction() {
+
+            if (predictionInterval === null) {
+                   predictionInterval = setInterval(
+                        sendFrame,
+                        500
+                    ); 
+                }
+        }
+
+        function stopPrediction() {
+
+            clearInterval(predictionInterval);
+            predictionInterval = null;
+        }
+    </script>
+</body>
+</html>
